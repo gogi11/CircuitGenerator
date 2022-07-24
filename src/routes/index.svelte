@@ -34,7 +34,7 @@ onMount(()=> {
     const edges: Edge[] = [];
     const outputs: OutputGate[] = [];
 
-
+    // TODO: Delete this function
     function bla(){
         const source1 = new SourceGate();
         sources.push(source1);

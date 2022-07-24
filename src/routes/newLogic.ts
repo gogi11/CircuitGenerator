@@ -5,6 +5,9 @@ export type tmp = number;
 
 type Func<T> = ()=>T;
 
+//TODO: move classes to seperate files
+//TODO: create a better connection between konva events and logic
+
 export class Edge {
     private color: string;
     private from: Gate;
