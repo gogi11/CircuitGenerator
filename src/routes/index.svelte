@@ -8,9 +8,9 @@ import { SourceGate, OrGate, CustomGate, NotGate, AndGate, Gate, Edge, OutputGat
 
 onMount(()=> {
     let stage = new Konva.Stage({
-    container: 'container',
-    width: 1300,
-    height: 500
+        container: 'container',
+        width: 1300,
+        height: 500
     });
 
     let layer = new Konva.Layer();
@@ -48,7 +48,7 @@ onMount(()=> {
         edges.push(new Edge(not, 0, or, 1));
         gates.push(or);
 
-        const resultingGate = new CustomGate("resulting", "#232", source1.outputs[0], or.outputs[0]);
+        const resultingGate = new CustomGate("resulting", "#232", 2, source1.outputs[0], or.outputs[0]);
         edges.push(new Edge(source1, 0, resultingGate, 0));
         edges.push(new Edge(or, 0, resultingGate, 1));
         gates.push(resultingGate);
@@ -69,7 +69,7 @@ onMount(()=> {
         edges.push(new Edge(and, 0, output2, 0));
         outputs.push(output2);
 
-        const moreComplexGate = new CustomGate("complex", "#232", resultingGate.outputs[0], and.outputs[0]);
+        const moreComplexGate = new CustomGate("complex", "#232", 2, resultingGate.outputs[0], and.outputs[0]);
     }
     bla();
 
@@ -80,7 +80,6 @@ onMount(()=> {
 
     stage.add(layer);
     layer.draw();
-
 });
 
 
