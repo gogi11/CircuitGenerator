@@ -15,7 +15,7 @@ function getAnchorPointCoords(firstGroup: Konva.Group, secondGroup: Konva.Group,
 export function createLineGroup(firstGroup: Konva.Group, secondGroup: Konva.Group, edge: Edge): Konva.Group {
     const group = new Konva.Group();
 
-    const {pos1, pos2} = getAnchorPointCoords(firstGroup, secondGroup, edge);
+    const {pos1, pos2} = getAnchorPointCoords(firstGroup!, secondGroup!, edge);
 
     const line = new Konva.Line({
         points: [pos1.x, pos1.y, pos2.x, pos2.y],
@@ -23,17 +23,18 @@ export function createLineGroup(firstGroup: Konva.Group, secondGroup: Konva.Grou
         strokeWidth: 2,
         lineCap: 'round',
         lineJoin: 'round',
+        name: 'line',
     });
     group.add(line);
 
     const resetPos = () => {
-        const {pos1, pos2} = getAnchorPointCoords(firstGroup, secondGroup, edge);
+        const {pos1, pos2} = getAnchorPointCoords(firstGroup!, secondGroup!, edge);
         line.points([pos1.x, pos1.y, pos2.x, pos2.y]);
     }
 
 
-    firstGroup.on('dragmove', () => resetPos());
-    secondGroup.on('dragmove', () => resetPos());
+    firstGroup!.on('dragmove', () => resetPos());
+    secondGroup!.on('dragmove', () => resetPos());
     
     return group;
 }

@@ -5,7 +5,7 @@ import { createRectangleGroup } from "./drawing/rectangle";
 
 export type tmp = number;
 
-type Func<T> = ()=>T;
+export type Func<T> = ()=>T;
 
 //TODO: move classes to seperate files
 //TODO: create a better connection between konva events and logic
@@ -50,6 +50,14 @@ export class Edge {
 
     public getColor(){
         return this.color;
+    }
+
+    public colorActivePath(){
+        if(this.from.outputs[this.outputNr]()){
+            (this.konva.find('.line')[0] as Konva.Line).stroke('#ff0000');
+        }else{
+            (this.konva.find('.line')[0] as Konva.Line).stroke('#000000');
+        }
     }
 }
 
@@ -101,10 +109,12 @@ export abstract class Gate{
 
 export class CustomGate extends Gate{
     public outputs: Func<boolean>[] = [];
+    public inputs: SourceGate[] = [];
 
-    constructor(name: string, color: string, nrInputs: number, ...outputs:Func<boolean>[]){
-        super(name, color, nrInputs);
+    constructor(name: string, color: string, inputs: SourceGate[], ...outputs:Func<boolean>[]){
+        super(name, color, inputs.length);
         this.outputs.push(...outputs);
+        this.inputs = inputs.map(x=>x);
     }
 }
 
@@ -138,7 +148,6 @@ export class OutputGate extends Gate{
         super("output", '#00f', 1);
         const output = ()=>output1();
         this.outputs.push(output);
-        // (this.konva.children![1] as Konva.Text).setText(""+this.outputs[0]());
     }
 
     protected createKonva(){
@@ -152,6 +161,7 @@ export class SourceGate extends Gate{
 
     public toggle(){
         this.on = !this.on;
+        this.konva?.children![0].setAttrs({fill: this.on? '#f00':'#000'});
     }
     
     public set(value: boolean){
@@ -163,7 +173,6 @@ export class SourceGate extends Gate{
         this.on = true;
         const output = ()=>this.on;
         this.outputs.push(output);
-        // (this.konva.children![1] as Konva.Text).setText(""+this.on);
     }
 
     protected createKonva(){

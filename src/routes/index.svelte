@@ -2,8 +2,8 @@
 import Header from "./headers/header.svelte";
 import Konva from "konva";
 import { onMount } from "svelte";
-
-import { SourceGate, OrGate, CustomGate, NotGate, AndGate, Gate, Edge, OutputGate } from "./newLogic";
+import { GateManager } from "./GateManager";
+import type { SourceGate } from "./newLogic";
 
 
 onMount(()=> {
@@ -27,56 +27,29 @@ onMount(()=> {
     layer.add(boundary);
 
 
-    // TODO: Make a manager for these variables
-    // It will definetely need to generate edges and a ComplexGate from all the variables together
-    const sources: SourceGate[] = [];
-    const gates: Gate[] = [];
-    const edges: Edge[] = [];
-    const outputs: OutputGate[] = [];
+    const gateManager = new GateManager(layer);
 
-    // TODO: Delete this function
-    function bla(){
-        const source1 = new SourceGate();
-        sources.push(source1);
-        
-        const not = new NotGate(source1.outputs[0]);
-        edges.push(new Edge(source1, 0, not, 0));
-        gates.push(not);
+    const source1 = gateManager.addGate("source");
+    const source2 = gateManager.addGate("source");
+    source2.getKonva().offsetY(-60);
+    
+    const or = gateManager.addGate("or", {gate: source1, outputNr: 0}, {gate: source2, outputNr: 0});
+    const and = gateManager.addGate("and", {gate: source1, outputNr: 0}, {gate: source2, outputNr: 0});
+    const not = gateManager.addGate("not", {gate: and, outputNr: 0});
+    const and2 = gateManager.addGate("and", {gate: or, outputNr: 0}, {gate: not, outputNr: 0});
+    const output = gateManager.addGate("output", {gate: and2, outputNr: 0});
+    const xorGate = gateManager.exportToCustomGate("xor");
 
-        const or = new OrGate(source1.outputs[0], not.outputs[0]);
-        edges.push(new Edge(source1, 0, or, 0));
-        edges.push(new Edge(not, 0, or, 1));
-        gates.push(or);
+    
+    // gateManager.clear();
+    // const source3 = gateManager.addGate("source");
+    // const source4 = gateManager.addGate("source");
+    // source4.getKonva().offsetY(-60);
+    // gateManager.connectCustomGate(xorGate, [source3 as SourceGate, source4 as SourceGate]);
+    // const output2 = gateManager.addGate("output", {gate: xorGate, outputNr: 0});
 
-        const resultingGate = new CustomGate("resulting", "#232", 2, source1.outputs[0], or.outputs[0]);
-        edges.push(new Edge(source1, 0, resultingGate, 0));
-        edges.push(new Edge(or, 0, resultingGate, 1));
-        gates.push(resultingGate);
-
-        const and = new AndGate(source1.outputs[0], resultingGate.outputs[1]);
-        edges.push(new Edge(source1, 0, and, 0));
-        edges.push(new Edge(resultingGate, 1, and, 1));
-        gates.push(and);
-
-
-        const output1 = new OutputGate(resultingGate.outputs[0]);
-        edges.push(new Edge(resultingGate, 0, output1, 0));
-        outputs.push(output1);
-
-
-        const output2 = new OutputGate(and.outputs[0]);
-        output2.getKonva().position({x: 1023, y: 123});
-        edges.push(new Edge(and, 0, output2, 0));
-        outputs.push(output2);
-
-        const moreComplexGate = new CustomGate("complex", "#232", 2, resultingGate.outputs[0], and.outputs[0]);
-    }
-    bla();
-
-    edges.forEach(e => layer.add(e.getKonva()));
-    sources.forEach(s => layer.add(s.getKonva()));
-    outputs.forEach(o => layer.add(o.getKonva()));
-    gates.forEach(g => layer.add(g.getKonva()));
+    gateManager.addToLayer();
+    gateManager.colorPaths();
 
     stage.add(layer);
     layer.draw();
