@@ -145,13 +145,17 @@ export class NotGate extends Gate{
 
 export class OutputGate extends Gate{
     constructor(output1:Func<boolean>){
-        super("output", '#00f', 1);
+        super("output", '#000', 1);
         const output = ()=>output1();
         this.outputs.push(output);
     }
 
+    public fixColor(){
+        this.konva?.children![0].setAttrs({fill: this.outputs[0]() ? '#f00':'#000'});
+    }
+
     protected createKonva(){
-        return createCircleGroup(1023, 23, 20, "", this.color);
+        return createCircleGroup(1237, 23, 20, "", this.color);
     }
 }
 

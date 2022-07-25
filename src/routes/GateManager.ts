@@ -21,40 +21,65 @@ export class GateManager{
     }
 
 
-    // TODO: remove this type stuff
-    public addGate(type:GateTypes="source", ...args: GateArg[]): Gate{
-        if(type === "source"){
-            const gate = new SourceGate();
-            this.sources.push(gate);
-            gate.getKonva().on("click", ()=>{
-                gate.toggle();
-                this.colorPaths();
-            });
-            return gate;
+    public addSourceGate(){
+        const gate = new SourceGate();
+        this.sources.push(gate);
+        gate.getKonva().on("click", ()=>{
+            gate.toggle();
+            this.colorPaths();
+        });
+
+        gate.getKonva().offsetY(-60 * (this.sources.length-1));
+        return gate;
+    }
+
+    private fixPosition(gate: Gate, ...inputs: Gate[]){
+        gate.getKonva().offsetX(-160 * (this.gates.length-1) - 100);
+        if(inputs.length == 0){
+            return;
         }
-        let gate: Gate;
-        if(type === "and"){
-            gate = new AndGate(args[0].gate.outputs[args[0].outputNr], args[1].gate.outputs[args[1].outputNr]);
-            this.gates.push(gate);
-        }else if(type === "or"){
-            gate = new OrGate(args[0].gate.outputs[args[0].outputNr], args[1].gate.outputs[args[1].outputNr]);
-            this.gates.push(gate);
-        }else if(type === "not"){
-            gate = new NotGate(args[0].gate.outputs[args[0].outputNr]);
-            this.gates.push(gate);
-        }else if(type === "output"){
-            gate = new OutputGate(args[0].gate.outputs[args[0].outputNr]);
-            this.outputs.push(gate as OutputGate);
-        }
-        
-        this.edges.push(new Edge(args[0].gate, args[0].outputNr, gate!, 0));
-        if(type === "and" || type === "or"){   
-            this.edges.push(new Edge(args[1].gate, args[1].outputNr, gate!, 1));
-        }
-        return gate!;
+        const minY = inputs.reduce((acc, curr) => Math.min(acc, curr.getKonva().offsetY()), gate.getKonva().offsetY());
+        const maxY = inputs.reduce((acc, curr) => Math.max(acc, curr.getKonva().offsetY()), gate.getKonva().offsetY());
+        const avgYOffset = (maxY - minY) / (inputs.length+5);
+        gate.getKonva().offsetY(minY+avgYOffset);
+    }
+
+
+    public addAndGate(firstInput: GateArg, secondInput:GateArg){
+        let gate = new AndGate(firstInput.gate.outputs[firstInput.outputNr], secondInput.gate.outputs[secondInput.outputNr]);
+        this.gates.push(gate);
+        this.fixPosition(gate, firstInput.gate, secondInput.gate);
+        this.edges.push(new Edge(firstInput.gate, firstInput.outputNr, gate, 0));
+        this.edges.push(new Edge(secondInput.gate, secondInput.outputNr, gate, 1));
+        return gate;
+    }
+
+    public addOrGate(firstInput: GateArg, secondInput:GateArg){
+        let gate = new OrGate(firstInput.gate.outputs[firstInput.outputNr], secondInput.gate.outputs[secondInput.outputNr]);
+        this.gates.push(gate);
+        this.fixPosition(gate, firstInput.gate, secondInput.gate);
+        this.edges.push(new Edge(firstInput.gate, firstInput.outputNr, gate, 0));
+        this.edges.push(new Edge(secondInput.gate, secondInput.outputNr, gate, 1));
+        return gate;
+    }
+
+    public addNotGate(input: GateArg){
+        let gate = new NotGate(input.gate.outputs[input.outputNr]);
+        this.gates.push(gate);
+        this.fixPosition(gate, input.gate);
+        this.edges.push(new Edge(input.gate, input.outputNr, gate, 0));
+        return gate;
+    }
+
+    public addOutputGate(input: GateArg){
+        let gate = new OutputGate(input.gate.outputs[input.outputNr]);
+        this.outputs.push(gate);
+        gate.getKonva().offsetY(-60 * (this.outputs.length-1));
+        this.edges.push(new Edge(input.gate, input.outputNr, gate, 0));
+        return gate;
     }
     
-    public connectCustomGate(customGate: CustomGate, newInputs: SourceGate[]): Gate{ 
+    public connectCustomGate(customGate: CustomGate, ...newInputs: Gate[]): Gate{ 
         for(let i=0; i<customGate.outputs.length; i++){
             const curr = customGate.outputs[i];
             customGate.outputs[i] = () => {
@@ -65,11 +90,13 @@ export class GateManager{
             } 
         }
         this.gates.push(customGate);
+        this.fixPosition(customGate, ...newInputs);
         
 
         for(let i=0; i<newInputs.length; i++){
             this.edges.push(new Edge(newInputs[i], 0, customGate, i));
         }
+
 
         return customGate;
     }
@@ -84,6 +111,7 @@ export class GateManager{
     
     public colorPaths(){
         this.edges.forEach(e => e.colorActivePath());
+        this.outputs.forEach(o => o.fixColor());
     }
 
     public exportToCustomGate(name: string, color = "#591bc3"){

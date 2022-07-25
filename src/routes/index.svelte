@@ -29,24 +29,25 @@ onMount(()=> {
 
     const gateManager = new GateManager(layer);
 
-    const source1 = gateManager.addGate("source");
-    const source2 = gateManager.addGate("source");
-    source2.getKonva().offsetY(-60);
+    const source1 = gateManager.addSourceGate();
+    const source2 = gateManager.addSourceGate();
     
-    const or = gateManager.addGate("or", {gate: source1, outputNr: 0}, {gate: source2, outputNr: 0});
-    const and = gateManager.addGate("and", {gate: source1, outputNr: 0}, {gate: source2, outputNr: 0});
-    const not = gateManager.addGate("not", {gate: and, outputNr: 0});
-    const and2 = gateManager.addGate("and", {gate: or, outputNr: 0}, {gate: not, outputNr: 0});
-    const output = gateManager.addGate("output", {gate: and2, outputNr: 0});
+    const or = gateManager.addOrGate({gate: source1, outputNr: 0}, {gate: source2, outputNr: 0});
+    const and = gateManager.addAndGate({gate: source1, outputNr: 0}, {gate: source2, outputNr: 0});
+    const not = gateManager.addNotGate({gate: and, outputNr: 0});
+    const and2 = gateManager.addAndGate({gate: or, outputNr: 0}, {gate: not, outputNr: 0});
+    const output = gateManager.addOutputGate({gate: and2, outputNr: 0});
     const xorGate = gateManager.exportToCustomGate("xor");
 
     
-    // gateManager.clear();
-    // const source3 = gateManager.addGate("source");
-    // const source4 = gateManager.addGate("source");
-    // source4.getKonva().offsetY(-60);
-    // gateManager.connectCustomGate(xorGate, [source3 as SourceGate, source4 as SourceGate]);
-    // const output2 = gateManager.addGate("output", {gate: xorGate, outputNr: 0});
+    gateManager.clear();
+    const source3 = gateManager.addSourceGate();
+    const source4 = gateManager.addSourceGate();
+    
+    const not2 = gateManager.addNotGate({gate: source4, outputNr: 0});
+
+    gateManager.connectCustomGate(xorGate, source3, not2);
+    const output2 = gateManager.addOutputGate({gate: xorGate, outputNr: 0});
 
     gateManager.addToLayer();
     gateManager.colorPaths();
