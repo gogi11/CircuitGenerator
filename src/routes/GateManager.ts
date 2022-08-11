@@ -1,9 +1,7 @@
 import type Konva from "konva";
-import { AndGate, CustomGate, Edge, Gate, NotGate, OrGate, OutputGate, SourceGate, type Func } from "./newLogic";
+import { AndGate, CustomGate, Edge, Gate, NotGate, OrGate, OutputGate, SourceGate } from "./newLogic";
 
 export type GateArg = {gate: Gate, outputNr: number};
-
-export type GateTypes = "and" | "or" | "not" | "output" | "source";
 
 export class GateManager{
     private sources: SourceGate[];

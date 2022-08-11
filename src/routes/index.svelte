@@ -3,7 +3,6 @@ import Header from "./headers/header.svelte";
 import Konva from "konva";
 import { onMount } from "svelte";
 import { GateManager } from "./GateManager";
-import type { SourceGate } from "./newLogic";
 
 
 onMount(()=> {
@@ -48,6 +47,7 @@ onMount(()=> {
 
     gateManager.connectCustomGate(xorGate, source3, not2);
     const output2 = gateManager.addOutputGate({gate: xorGate, outputNr: 0});
+    const output3 = gateManager.addOutputGate({gate: source4, outputNr: 0});
 
     gateManager.addToLayer();
     gateManager.colorPaths();

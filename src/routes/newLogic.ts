@@ -3,8 +3,6 @@ import { createLineGroup } from "./drawing/line";
 import { createCircleGroup } from "./drawing/circle";
 import { createRectangleGroup } from "./drawing/rectangle";
 
-export type tmp = number;
-
 export type Func<T> = ()=>T;
 
 //TODO: move classes to seperate files
