@@ -1,5 +1,5 @@
 import Konva from "konva";
-import type { Gate } from "../newLogic";
+import type { IOutputable } from "../simple_logic";
 
 
     
@@ -24,7 +24,7 @@ function createAnchorPoints(totalHeight: number, nr: number, radius: number=10) 
 
 
 export function createRectangleGroup(
-    x: number, y: number, width: number, inputHeight: number, gate: Gate): Konva.Group {
+    x: number, y: number, width: number, inputHeight: number, gate: IOutputable): Konva.Group {
     const group = new Konva.Group({draggable: true});
 
     const nrInputs = gate.getNrOfInputs();

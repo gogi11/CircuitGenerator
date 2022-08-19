@@ -2,7 +2,11 @@
 import Header from "./headers/header.svelte";
 import Konva from "konva";
 import { onMount } from "svelte";
-import { GateManager } from "./GateManager";
+import { InputSimpleGate } from "./gates/InputSimpleGate";
+import { OrSimpleGate } from "./gates/OrSimpleGate";
+import { AndSimpleGate } from "./gates/AndSimpleGate";
+import { NotSimpleGate } from "./gates/NotSimpleGate";
+import { OutputSimpleGate } from "./gates/OutputSimpleGate";
 
 
 onMount(()=> {
@@ -26,31 +30,53 @@ onMount(()=> {
     layer.add(boundary);
 
 
-    const gateManager = new GateManager(layer);
-
-    const source1 = gateManager.addSourceGate();
-    const source2 = gateManager.addSourceGate();
     
-    const or = gateManager.addOrGate({gate: source1, outputNr: 0}, {gate: source2, outputNr: 0});
-    const and = gateManager.addAndGate({gate: source1, outputNr: 0}, {gate: source2, outputNr: 0});
-    const not = gateManager.addNotGate({gate: and, outputNr: 0});
-    const and2 = gateManager.addAndGate({gate: or, outputNr: 0}, {gate: not, outputNr: 0});
-    const output = gateManager.addOutputGate({gate: and2, outputNr: 0});
-    const xorGate = gateManager.exportToCustomGate("xor");
+    const source1 = new InputSimpleGate();
+    const source2 = new InputSimpleGate();
+
+    const or = new OrSimpleGate();
+    const and = new AndSimpleGate();
+    const not = new NotSimpleGate();
+    const and2 = new AndSimpleGate();
+    
+    const output = new OutputSimpleGate();
+
+
+    or.setInput(source1, 0);
+    or.setInput(source2, 1);
+
+    and.setInput(source1, 0);
+    and.setInput(source2, 1);
+
+    not.setInput(and);
+
+    and2.setInput(not, 0);
+    and2.setInput(or, 1);
+
+    output.setInput(and2);
+
+
+
+    layer.add(source1.getKonvaGroup());
+    layer.add(source2.getKonvaGroup());
+    layer.add(and.getKonvaGroup());
+    layer.add(or.getKonvaGroup());
+    layer.add(not.getKonvaGroup());
+    layer.add(and2.getKonvaGroup());
+    layer.add(output.getKonvaGroup());
+
+
+    console.log(output.getOutput());
+
+    // const source1 = gateManager.addSourceGate();
+    // const source2 = gateManager.addSourceGate();
+    // const or = gateManager.addOrGate({gate: source1, outputNr: 0}, {gate: source2, outputNr: 0});
+    // const and = gateManager.addAndGate({gate: source1, outputNr: 0}, {gate: source2, outputNr: 0});
+    // const not = gateManager.addNotGate({gate: and, outputNr: 0});
+    // const and2 = gateManager.addAndGate({gate: or, outputNr: 0}, {gate: not, outputNr: 0});
+    // const output = gateManager.addOutputGate({gate: and2, outputNr: 0});
 
     
-    gateManager.clear();
-    const source3 = gateManager.addSourceGate();
-    const source4 = gateManager.addSourceGate();
-    
-    const not2 = gateManager.addNotGate({gate: source4, outputNr: 0});
-
-    gateManager.connectCustomGate(xorGate, source3, not2);
-    const output2 = gateManager.addOutputGate({gate: xorGate, outputNr: 0});
-    const output3 = gateManager.addOutputGate({gate: source4, outputNr: 0});
-
-    gateManager.addToLayer();
-    gateManager.colorPaths();
 
     stage.add(layer);
     layer.draw();

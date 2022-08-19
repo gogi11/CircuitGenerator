@@ -1,3 +1,14 @@
+//TODO::: DELETE THIS
+
+
+
+
+
+
+
+
+
+
 import type Konva from "konva";
 import { AndGate, CustomGate, Edge, Gate, NotGate, OrGate, OutputGate, SourceGate } from "./newLogic";
 
