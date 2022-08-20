@@ -1,8 +1,9 @@
 import type Konva from "konva";
 import { createRectangleGroup } from "../../drawing/rectangle";
+import type { IDrawable } from "./IDrawable";
 import type { IOutputable } from "./IOutputable";
 
-export abstract class OneInputSimpleGate implements IOutputable{
+export abstract class OneInputSimpleGate implements IOutputable, IDrawable{
     protected input: IOutputable | null =null;
     protected konva: Konva.Group | null = null;
 
